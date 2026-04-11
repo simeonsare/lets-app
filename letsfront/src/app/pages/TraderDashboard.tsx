@@ -1,4 +1,6 @@
 import { useNavigate } from "react-router";
+import { use, useEffect, useState } from "react";
+import { toast } from "sonner";
 import {
   Package,
   Plus,
@@ -10,6 +12,7 @@ import {
   MapPin,
   User,
 } from "lucide-react";
+
 
 // Mock delivery data
 const mockDeliveries = [
@@ -50,11 +53,39 @@ const mockDeliveries = [
     rider: "Peter Ochieng",
   },
 ];
+const token = localStorage.getItem("authToken");
 
 export default function TraderDashboard() {
+  
   const navigate = useNavigate();
+  const [deliveries, setDeliveries] = useState([]);
+  useEffect(() => {
+    fetch("/api/deliveries/", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Token ${token}` ,
+      },
+      credentials: "include",
+    })
+      .then((res) => {
+        if (!res.ok) {
+          toast.error("Failed to fetch deliveries");
+          throw new Error("Failed to fetch deliveries");
+        }
+        return res.json();
+      })
+      .then((data) => setDeliveries(data))
+      .then(() => console.log(deliveries))
+      .catch((err) => {
+        toast.error("Failed to fetch deliveries");
+        console.error(err);
+      });
+  }, []);
+  
+  
 
-  const pendingCount = mockDeliveries.filter((d) => d.status === "pending").length;
+  const pendingCount = deliveries.filter((d) => d.status === "pending").length;
   const assignedCount = mockDeliveries.filter((d) => d.status === "assigned").length;
   const deliveredCount = mockDeliveries.filter((d) => d.status === "delivered").length;
 

@@ -9,22 +9,33 @@ const token =localStorage.getItem("authToken");
 export default function DeliveryRequest() {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    buildingname: "",
+    pickup_location: "",
     stallnumber:"",
-    destination: "Modern Coast",
-    packageDesc: "",
+    dropoff_location: "Modern Coast",
+    package_details: "",
     quantity: "",
   });
+  function getCookie(name: string): string {
+  if (typeof document === "undefined") return "";
+  const cookies = document.cookie ? document.cookie.split(";") : [];
+  for (let cookie of cookies) {
+    const [key, ...valParts] = cookie.split("=");
+    if (key && key.trim() === name) {
+      return decodeURIComponent(valParts.join("="));
+    }
+  }
+  return "";
+}
 
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-        const res = await fetch("/api/deliveryrequest/", {
+        const res = await fetch("/api/request-delivery/", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Token ${token}`
+          "Authorization": `Token ${token}`,
         },
         body: JSON.stringify(formData),
       });
@@ -35,7 +46,7 @@ export default function DeliveryRequest() {
       const data = await res.json();
       toast.success("Request successful.");
       setTimeout(() => {
-        window.location.href = "/trader/request${requestid}";
+        window.location.href = "/trader/dashboard";
       }, 2000); // 2-second delay
       
     } catch (error) {
@@ -86,8 +97,8 @@ export default function DeliveryRequest() {
                 <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                 <input
                   type="text"
-                  value={formData.buildingname}
-                  onChange={(e) => updateField("buildingname", e.target.value)}
+                  value={formData.pickup_location}
+                  onChange={(e) => updateField("pickup_location", e.target.value)}
                   placeholder="e.g., Wameni Complex"
                   className="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition"
                   required
@@ -121,8 +132,8 @@ export default function DeliveryRequest() {
               <div className="relative">
                 <Package className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                 <select
-                  value={formData.destination}
-                  onChange={(e) => updateField("destination", e.target.value)}
+                  value={formData.dropoff_location}
+                  onChange={(e) => updateField("dropoff_location", e.target.value)}
                   className="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition appearance-none bg-white"
                   required
                 >
@@ -146,8 +157,8 @@ export default function DeliveryRequest() {
               <div className="relative">
                 <FileText className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
                 <textarea
-                  value={formData.packageDesc}
-                  onChange={(e) => updateField("packageDesc", e.target.value)}
+                  value={formData.package_details}
+                  onChange={(e) => updateField("package_details", e.target.value)}
                   placeholder="e.g., Electronics, Clothing, Books..."
                   rows={4}
                   className="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition resize-none"
@@ -212,3 +223,5 @@ export default function DeliveryRequest() {
     </div>
   );
 }
+
+

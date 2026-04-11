@@ -24,6 +24,7 @@ urlpatterns = [
     path('api/register/',views.register_user, name='register'),
     path('api/login/', views.login_user, name='login'),
     path('api/forgot-password/', views.forgot_password, name='forgot_password'),
-    
+    path('api/request-delivery/', views.create_request, name='request_delivery'),
+    path('api/deliveries/', views.deliveries, name='deliveries'),
     #path('create_profile/', views.create_profile, name='create_profile'),
 ]
