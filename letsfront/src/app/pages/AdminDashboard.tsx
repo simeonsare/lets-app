@@ -196,10 +196,12 @@ export default function AdminDashboard() {
             <p className="text-sm text-gray-600">View system reports</p>
           </button>
 
-          <button className="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-md transition text-left">
+          <button 
+          onClick={() => navigate("/admin/addlsp")}
+          className="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-md transition text-left">
             <Users className="w-8 h-8 text-indigo-600 mb-3" />
-            <h3 className="font-semibold text-gray-900 mb-1">Manage Users</h3>
-            <p className="text-sm text-gray-600">Traders & Riders</p>
+            <h3 className="font-semibold text-gray-900 mb-1">Manage LSPs</h3>
+            <p className="text-sm text-gray-600">Add and manage Logistics Service Providers</p>
           </button>
         </div>
 

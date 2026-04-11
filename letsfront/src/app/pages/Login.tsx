@@ -24,6 +24,8 @@ export default function Login() {
 
         toast.error("Invalid credentials");
         throw new Error("Invalid credentials");
+      }else {
+        toast.success("Login successful");
       }
         
       // Save user data in context or global store here     

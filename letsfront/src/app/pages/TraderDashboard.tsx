@@ -82,12 +82,36 @@ export default function TraderDashboard() {
         console.error(err);
       });
   }, []);
-  
+
   
 
-  const pendingCount = deliveries.filter((d) => d.status === "pending").length;
+  const pendingCount = mockDeliveries.filter((d) => d.status === "pending").length;
   const assignedCount = mockDeliveries.filter((d) => d.status === "assigned").length;
   const deliveredCount = mockDeliveries.filter((d) => d.status === "delivered").length;
+
+//getting our logistic service providers 
+  const [lsps, setLsps] = useState([]);
+  useEffect(() => {
+    fetch("/api/lsps/", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Token ${token}`,
+      },
+      credentials: "include",
+    })
+      .then((res) => {
+        if (!res.ok) {
+          toast.error("Failed to fetch LSPs");
+        }
+        return res.json();
+      })
+      .then((data) => setLsps(data.lsps))
+      .catch((err) => {
+        toast.error("Failed to fetch LSPs");
+      });
+  }, []);
+
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -116,6 +140,27 @@ export default function TraderDashboard() {
         return null;
     }
   };
+  const handlelogout = () => {
+    fetch("/api/logout/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Token ${token}`,
+      },
+      credentials: "include",
+    })
+      .then((res) => {
+        if (!res.ok) {
+          toast.error("Logout failed");
+          throw new Error("Logout failed");
+        }
+        toast.success("Logged out successfully");
+      })
+      .catch((err) => {
+        toast.error("Logout failed");
+        console.error(err);
+      });
+  };
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -131,16 +176,28 @@ export default function TraderDashboard() {
               <p className="text-sm text-gray-600">Kamukunji Market</p>
             </div>
           </div>
+          <div className="flex items-center gap-4">
+          
+          <div
+          onClick={()=>{navigate("/trader/profile");}}
+          className="flex items-center gap-2 px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition"
+        >
+          <User className="w-5 h-5 text-gray-700" />
+          <span>My Profile</span>
+        </div>
           <button
             onClick={() => {
               localStorage.clear();
               navigate("/login");
+              handlelogout();
+
             }}
             className="flex items-center gap-2 px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition"
           >
             <LogOut className="w-5 h-5" />
             Logout
           </button>
+         </div>
         </div>
       </header>
 
@@ -195,6 +252,40 @@ export default function TraderDashboard() {
             Create Delivery Request
           </button>
         </div>
+
+      {/* LSP Drop-off Points Section */}
+      <div className="mt-10">
+        <h2 className="text-2xl font-bold text-gray-900 mb-6">
+          Major LSP Drop-off Points in Nairobi
+        </h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {lsps.map((lsp) => (
+            <div
+              key={lsp.id}
+              className="bg-white rounded-xl shadow-sm p-6 border border-gray-200"
+            >
+              <div className="flex items-center gap-3 mb-4">
+                {lsp.logo ? (
+                  <img
+                    src={lsp.logo}
+                    alt={lsp.name}
+                    className="w-12 h-12 object-contain rounded"
+                  />
+                ) : (
+                  <div className="w-12 h-12 bg-gray-100 rounded flex items-center justify-center text-gray-500">
+                    {lsp.name[0]}
+                  </div>
+                )}
+                <h3 className="text-lg font-semibold text-gray-900">{lsp.name}</h3>
+              </div>
+              <p className="text-sm text-gray-600">{lsp.contact_info}</p>
+              <p className="text-sm text-gray-600 mt-2">
+                Price: <span className="font-bold">KES {lsp.price_per_kg}/kg</span>
+              </p>
+            </div>
+          ))}
+        </div>
+      </div>
 
         {/* Deliveries Table */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">

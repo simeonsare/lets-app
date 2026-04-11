@@ -2,8 +2,10 @@ import { createBrowserRouter, Navigate } from "react-router";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import TraderDashboard from "./pages/TraderDashboard";
+import TraderProfile from "./pages/TraderProfile";
 import RiderDashboard from "./pages/RiderDashboard";
 import AdminDashboard from "./pages/AdminDashboard";
+import Admin_addlsp from "./pages/Admin_addlsp";
 import DeliveryRequest from "./pages/DeliveryRequest";
 import BatchDelivery from "./pages/BatchDelivery";
 import RiderAssignment from "./pages/RiderAssignment";
@@ -46,6 +48,14 @@ export const router = createBrowserRouter([
         ),
         
       },
+      {
+        path: "trader/profile",
+        element: (
+          <ProtectedRoute allowedRoles={["trader"]}>
+            <TraderProfile />
+          </ProtectedRoute>
+        ),
+      },
       { 
         path: "trader/request", 
         element: (
@@ -67,6 +77,14 @@ export const router = createBrowserRouter([
         element: (
           <ProtectedRoute allowedRoles={["admin"]}>
             <AdminDashboard />
+          </ProtectedRoute>
+        )
+      },
+      {
+        path: "admin/addlsp",
+        element: (
+          <ProtectedRoute allowedRoles={["admin"]}>
+            <Admin_addlsp />
           </ProtectedRoute>
         )
       },

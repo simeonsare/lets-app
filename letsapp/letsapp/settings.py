@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-+!2&vpt8!zmog2q6f8b6jg3s$p!6c@o$ixh7uj_of_goeq(fqq
 DEBUG = True
 
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["413a-102-209-18-110.ngrok-free.app", "localhost", "127.0.0.1"]
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:8080",
@@ -150,3 +150,16 @@ STATIC_URL = 'static/'
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_HOST = "localhost"
 EMAIL_PORT = 25
+
+# MPESA Configuration 
+MPESA_CONFIG = {
+    'BASE_URL': 'https://sandbox.safaricom.co.ke',
+    'CONSUMER_KEY': 'z6cSKnVVCiZZDTJsGZz4ZETlaMdva0gmERSmsSWqdqTX6XgD',
+    'CONSUMER_SECRET': 'KFmC9Dkv7oVdgXa3gHM1iaNLhlTItKozC3AG6Obxp0AJgRnCKBSag94GYiKOVBP3',
+    'BUSINESS_SHORT_CODE': '174379',
+    'PASSKEY': 'bfb279f9aa9bdbcf158e97dd71a467cd2e0c893059b10f78e6b72ada1ed2c919',
+    'CALLBACK_URL': 'https://413a-102-209-18-110.ngrok-free.app/mpesa/callback/', 
+    
+    'INITIATOR_NAME': 'testapi',
+
+}

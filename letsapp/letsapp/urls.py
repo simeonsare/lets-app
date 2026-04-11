@@ -24,7 +24,14 @@ urlpatterns = [
     path('api/register/',views.register_user, name='register'),
     path('api/login/', views.login_user, name='login'),
     path('api/forgot-password/', views.forgot_password, name='forgot_password'),
+    path('api/trader/profile/', views.trader_profile, name='trader_profile'),
+    path('api/update_profile/', views.update_profile, name='update_profile'),
+    path('api/logout/', views.logout_user, name='logout'),
+    
     path('api/request-delivery/', views.create_request, name='request_delivery'),
-    path('api/deliveries/', views.deliveries, name='deliveries'),
-    #path('create_profile/', views.create_profile, name='create_profile'),
+    path('api/process-payment/', views.process_payment, name='process_payment'),#path to mpesa payment processing
+    path('api/deliveries/', views.deliveries, name='deliveries'), #path('create_profile/', views.create_profile, name='create_profile'),
+    path ('api/lsps/', views.lsp_list, name='lsp_list'),
+    path ('mpesa/callback/', views.mpesa_callback, name='mpesa_callback'),
+    path ('api/payment-status/<str:checkoutid>/', views.payment_status, name='payment_status'),
 ]
