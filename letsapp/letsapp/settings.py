@@ -25,13 +25,18 @@ SECRET_KEY = 'django-insecure-+!2&vpt8!zmog2q6f8b6jg3s$p!6c@o$ixh7uj_of_goeq(fqq
 DEBUG = True
 
 
-ALLOWED_HOSTS = ["413a-102-209-18-110.ngrok-free.app", "localhost", "127.0.0.1"]
+ALLOWED_HOSTS = [
+    "b9cf-102-209-18-110.ngrok-free.app",
+    "localhost",
+    "127.0.0.1",
+    ]
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:8080",
     "http://localhost:8080",
     "http://localhost:8000",   
-    "http://127.0.0.1:8000", 
+    "http://127.0.0.1:8000",
+    "https://b9cf-102-209-18-110.ngrok-free.app",
 ]
 
 
@@ -40,6 +45,7 @@ CSRF_TRUSTED_ORIGINS = [
     "http://localhost:8080",
     "http://localhost:8000",   
     "http://127.0.0.1:8000",
+    "https://b9cf-102-209-18-110.ngrok-free.app",
 ]
 
 
@@ -48,6 +54,7 @@ CSRF_TRUSTED_ORIGINS = [
 # Application definition
 
 INSTALLED_APPS = [
+    'daphne',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -58,6 +65,9 @@ INSTALLED_APPS = [
     'letsapp',
     'rest_framework',
     'rest_framework.authtoken',
+    'channels',
+    'django_celery_results',
+  
 
 ]
 
@@ -86,7 +96,7 @@ ROOT_URLCONF = 'letsapp.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        "DIRS": [BASE_DIR / "dist" ],  # global templates folder
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -97,8 +107,28 @@ TEMPLATES = [
         },
     },
 ]
+ASGI_APPLICATION = 'letsapp.asgi.application'
 
-WSGI_APPLICATION = 'letsapp.wsgi.application'
+#WSGI_APPLICATION = 'letsapp.wsgi.application'
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            'hosts': [{
+                'address': 'rediss://default:gQAAAAAAATeEAAIncDI0MmVkZjcyYTc0ZmQ0ZjI2YTJmNDcxNjg0N2YzODkwNXAyNzk3NDg@wanted-fowl-79748.upstash.io:6379',
+                'ssl_cert_reqs': None,
+            }],
+        },
+    }
+}
+
+
+CELERY_BROKER_URL = 'rediss://default:gQAAAAAAATeEAAIncDI0MmVkZjcyYTc0ZmQ0ZjI2YTJmNDcxNjg0N2YzODkwNXAyNzk3NDg@wanted-fowl-79748.upstash.io:6379'
+CELERY_RESULT_BACKEND = 'django-db'
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
 
 
 # Database
@@ -158,8 +188,16 @@ MPESA_CONFIG = {
     'CONSUMER_SECRET': 'KFmC9Dkv7oVdgXa3gHM1iaNLhlTItKozC3AG6Obxp0AJgRnCKBSag94GYiKOVBP3',
     'BUSINESS_SHORT_CODE': '174379',
     'PASSKEY': 'bfb279f9aa9bdbcf158e97dd71a467cd2e0c893059b10f78e6b72ada1ed2c919',
-    'CALLBACK_URL': 'https://413a-102-209-18-110.ngrok-free.app/mpesa/callback/', 
+    'CALLBACK_URL': 'https://b9cf-102-209-18-110.ngrok-free.app/mpesa/callback/', 
     
     'INITIATOR_NAME': 'testapi',
 
 }
+# static files configuration
+
+# Where collectstatic will put all static files for production
+STATIC_ROOT = BASE_DIR / "staticfiles"
+
+STATICFILES_DIRS = [
+    BASE_DIR / "dist",
+]

@@ -7,6 +7,14 @@
     "build": "vite build",
     "dev": "vite"
   },
+  
+  "compilerOptions": {
+    "rootDir": "./src",
+    "outDir": "./dist",
+    "target": "es6",
+    "module": "commonjs"
+  },
+
   "dependencies": {
     "@emotion/react": "11.14.0",
     "@emotion/styled": "11.14.1",

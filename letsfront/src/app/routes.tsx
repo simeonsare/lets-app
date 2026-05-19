@@ -15,6 +15,8 @@ import Reports from "./pages/Reports";
 import Layout from "./components/Layout";
 import { JSX } from "react";
 import ForgotPassword from "./pages/ForgotPassword";
+import RiderProfile from "./pages/RiderProfile";
+import Assignmentpage from "./pages/Assignmentpage";
 
 const ProtectedRoute = ({ children, allowedRoles }: { children: JSX.Element; allowedRoles?: string[] }) => {
   const token = localStorage.getItem("authToken");
@@ -73,6 +75,22 @@ export const router = createBrowserRouter([
         )
       },
       { 
+        path: "rider/profile", 
+        element: (
+          <ProtectedRoute allowedRoles={["rider"]}>
+            <RiderProfile />
+          </ProtectedRoute>
+        )
+      },
+       {
+        path: "rider/assignments",
+        element: (
+          <ProtectedRoute allowedRoles={["rider"]}>
+            <Assignmentpage />
+          </ProtectedRoute>
+        )
+      },
+      { 
         path: "admin/dashboard", 
         element: (
           <ProtectedRoute allowedRoles={["admin"]}>
@@ -80,6 +98,7 @@ export const router = createBrowserRouter([
           </ProtectedRoute>
         )
       },
+     
       {
         path: "admin/addlsp",
         element: (

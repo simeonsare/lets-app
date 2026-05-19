@@ -4,16 +4,17 @@ import tailwindcss from '@tailwindcss/vite'
 import react from '@vitejs/plugin-react'
 
 export default defineConfig({
+    //base:"/static/",
     server: {
     host: "::",
     port: 8080,
     proxy: {
       '/media':{
-        //target: 'https://simeon254.pythonanywhere.com',
+      //  target: 'https://simeon254.pythonanywhere.com',
         target: 'http://localhost:8000',
         changeOrigin: true,
       },
-    // "/api": "https://simeon254.pythonanywhere.com",
+     //"/api": "https://simeon254.pythonanywhere.com",
     "/api":"http://localhost:8000",
     },
   },

@@ -34,16 +34,18 @@ export default function Register() {
       });
 
       if (!res.ok) {
-        throw new Error("Registration failed");
+        const errorData = await res.json();
+        throw new Error(errorData.detail || "Registration failed. Please try again.");
       }
       const data = await res.json();
       alert("Registration successful! Please log in.");
       setTimeout(() => {
         window.location.href = "/login";
       }, 2000); // 2-second delay
-      
+      toast.success("Registration successful! Please log in.");
     } catch (error) {
-      toast.error("Registration failed. Please try again.");
+     toast.error(error.message || "An error occurred during registration.");
+     // toast.error("Registration failed. Please try again.");
       console.error("Registration error:", error);
     }
    

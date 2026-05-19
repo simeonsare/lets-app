@@ -1,145 +1,47 @@
 import { useNavigate, useParams } from "react-router";
 import { ArrowLeft, MapPin, Package, User, CheckCircle, Clock } from "lucide-react";
+import { use, useEffect, useState } from "react";
+import { toast } from "sonner";
 
-const trackingData = {
-  DEL001: {
-    id: "DEL001",
-    trader: "Trader A",
-    traderPhone: "0711111111",
-    rider: "John Kamau",
-    riderPhone: "0712345678",
-    pickup: "Shop 45, Block A, Kamukunji",
-    destination: "Modern Coast",
-    packageDesc: "Electronics",
-    items: 5,
-    currentStatus: "delivered",
-    timeline: [
-      {
-        status: "Request Submitted",
-        timestamp: "2026-03-28 09:00",
-        description: "Delivery request created by trader",
-        completed: true,
-      },
-      {
-        status: "Rider Assigned",
-        timestamp: "2026-03-28 09:15",
-        description: "John Kamau assigned to this delivery",
-        completed: true,
-      },
-      {
-        status: "Picked Up",
-        timestamp: "2026-03-28 10:30",
-        description: "Package picked up from Kamukunji Market",
-        completed: true,
-      },
-      {
-        status: "In Transit",
-        timestamp: "2026-03-28 10:45",
-        description: "On the way to Modern Coast",
-        completed: true,
-      },
-      {
-        status: "Delivered",
-        timestamp: "2026-03-28 11:20",
-        description: "Package delivered successfully",
-        completed: true,
-      },
-    ],
-  },
-  DEL002: {
-    id: "DEL002",
-    trader: "Trader B",
-    traderPhone: "0722222222",
-    rider: "Mary Wanjiru",
-    riderPhone: "0723456789",
-    pickup: "Shop 12, Block C, Kamukunji",
-    destination: "Easy Coach",
-    packageDesc: "Clothing",
-    items: 3,
-    currentStatus: "in_transit",
-    timeline: [
-      {
-        status: "Request Submitted",
-        timestamp: "2026-03-28 10:00",
-        description: "Delivery request created by trader",
-        completed: true,
-      },
-      {
-        status: "Rider Assigned",
-        timestamp: "2026-03-28 10:20",
-        description: "Mary Wanjiru assigned to this delivery",
-        completed: true,
-      },
-      {
-        status: "Picked Up",
-        timestamp: "2026-03-28 11:00",
-        description: "Package picked up from Kamukunji Market",
-        completed: true,
-      },
-      {
-        status: "In Transit",
-        timestamp: "2026-03-28 11:15",
-        description: "On the way to Easy Coach",
-        completed: true,
-      },
-      {
-        status: "Delivered",
-        timestamp: "-",
-        description: "Pending delivery",
-        completed: false,
-      },
-    ],
-  },
-  DEL003: {
-    id: "DEL003",
-    trader: "Trader C",
-    traderPhone: "0733333333",
-    rider: null,
-    pickup: "Shop 78, Block B, Kamukunji",
-    destination: "Modern Coast",
-    packageDesc: "Books",
-    items: 10,
-    currentStatus: "pending",
-    timeline: [
-      {
-        status: "Request Submitted",
-        timestamp: "2026-03-28 12:00",
-        description: "Delivery request created by trader",
-        completed: true,
-      },
-      {
-        status: "Rider Assigned",
-        timestamp: "-",
-        description: "Waiting for rider assignment",
-        completed: false,
-      },
-      {
-        status: "Picked Up",
-        timestamp: "-",
-        description: "Pending pickup",
-        completed: false,
-      },
-      {
-        status: "In Transit",
-        timestamp: "-",
-        description: "Pending",
-        completed: false,
-      },
-      {
-        status: "Delivered",
-        timestamp: "-",
-        description: "Pending",
-        completed: false,
-      },
-    ],
-  },
-};
+const token = localStorage.getItem("authToken");
+
+
 
 export default function DeliveryTracking() {
   const navigate = useNavigate();
   const { id } = useParams();
+  const [trackingInfo, setTrackingInfo] =useState(null);
+  useEffect(() => {
+    fetch(`/api/tracking/${id}`, {
+      method:"GET",
+      headers:{
+        "Content-Type": "application/json",
+        "Authorization": `Token ${token}`,
+      },
+      credentials: "include",
+    })
+    .then((res) => {
+      if (!res.ok) {
+        toast.error("Failed to fetch tracking information");
+      }
+      return res.json();
+    })
+    .then((data) => setTrackingInfo(data))
+    .catch((err) => console.error(err));
+  }, []);
+  if (!trackingInfo) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+        <div className="text-center">
+          <Clock className="w-12 h-12 text-gray-400 mx-auto mb-4 animate-pulse" />
+          <h2 className="text-xl font-semibold text-gray-900">Loading tracking information...</h2>
+          <p className="text-sm text-gray-600 mt-2">Please wait while we fetch the latest status of your delivery.</p>
+        </div>
+      </div>
+    );
+  } 
 
-  const delivery = trackingData[id as keyof typeof trackingData] || trackingData.DEL001;
+  const delivery = trackingInfo;
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -186,7 +88,7 @@ export default function DeliveryTracking() {
               <p className="text-sm text-gray-600 mb-1">Package Description</p>
               <div className="flex items-start gap-2">
                 <Package className="w-4 h-4 text-gray-400 mt-0.5" />
-                <p className="text-gray-900">{delivery.packageDesc} ({delivery.items} items)</p>
+                <p className="text-gray-900">{delivery.packageDesc} ({delivery.items} Kgs)</p>
               </div>
             </div>
             <div>

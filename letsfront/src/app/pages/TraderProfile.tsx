@@ -11,6 +11,7 @@ const token = localStorage.getItem("authToken");
 
 export default function TraderProfile() {
   const navigate = useNavigate();
+  const name = localStorage.getItem("name") || "Trader";
   const [formData, setFormData] = useState({
     stall_building: "",
     stall_number: "",
@@ -112,7 +113,7 @@ export default function TraderProfile() {
 
           }>
             <h1 className="text-xl font-bold text-gray-900">Trader Dashboard</h1>
-            <p className="text-sm text-gray-600">Kamukunji Market</p>
+            <p className="text-sm text-gray-600">{name}</p>
           </div>
         </div>
         <div className="flex items-center gap-4">

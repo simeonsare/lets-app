@@ -12,45 +12,9 @@ import {
   Clock,
   XCircle,
 } from "lucide-react";
+import { useEffect, useState } from "react";
+import { toast } from "react-toastify";
 
-// Mock data
-const stats = {
-  totalDeliveries: 245,
-  activeDeliveries: 18,
-  totalRiders: 12,
-  activeRiders: 8,
-  totalTraders: 56,
-  completedToday: 23,
-  pendingAssignments: 5,
-  revenue: 125000,
-};
-
-const recentDeliveries = [
-  {
-    id: "DEL010",
-    trader: "Trader M",
-    destination: "Modern Coast",
-    status: "delivered",
-    rider: "John Kamau",
-    time: "10 mins ago",
-  },
-  {
-    id: "DEL009",
-    trader: "Trader N",
-    destination: "Easy Coach",
-    status: "in_transit",
-    rider: "Mary Wanjiru",
-    time: "25 mins ago",
-  },
-  {
-    id: "DEL008",
-    trader: "Trader P",
-    destination: "Guardian Coach",
-    status: "pending",
-    rider: null,
-    time: "1 hour ago",
-  },
-];
 
 const topRiders = [
   { name: "John Kamau", deliveries: 45, rating: 4.9 },
@@ -60,34 +24,93 @@ const topRiders = [
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
+  const [dashboardData, setDashboardData] = useState({
+  totalDeliveries: 0,
+  activeDeliveries: 0,
+  totalRiders: 0,
+  activeRiders: 0,
+  totalTraders: 0,
+  completedToday: 0,
+  pendingAssignments: 0,
+  revenue: 0,
+});
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+  
+
+    fetch("/api/dashboard-stats/", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    })
+      .then((response) => {
+        if (!response.ok) {
+          toast.error("Failed to fetch dashboard data. Please try again.");
+          return;
+        }
+        console.log("Dashboard stats response:", response);
+        return response.json();
+      })
+      .then((data) => {
+        if (data) {
+          console.log("Dashboard stats data:", data);
+          setDashboardData(data);
+        }
+      });
+  }, []);
+
+  const timeAgo = (timestamp: string) => {
+  const diff = Math.floor((Date.now() - new Date(timestamp).getTime()) / 1000);
+  if (diff < 60) return `${diff}s ago`;
+  if (diff < 3600) return `${Math.floor(diff / 60)} mins ago`;
+  if (diff < 86400) return `${Math.floor(diff / 3600)} hours ago`;
+  return `${Math.floor(diff / 86400)} days ago`;
+};
 
   const getStatusBadge = (status: string) => {
-    switch (status) {
-      case "pending":
-        return (
-          <span className="inline-flex items-center gap-1 px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs font-medium">
-            <Clock className="w-3 h-3" />
-            Pending
-          </span>
-        );
-      case "in_transit":
-        return (
-          <span className="inline-flex items-center gap-1 px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-medium">
-            <TrendingUp className="w-3 h-3" />
-            In Transit
-          </span>
-        );
-      case "delivered":
-        return (
-          <span className="inline-flex items-center gap-1 px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium">
-            <CheckCircle className="w-3 h-3" />
-            Delivered
-          </span>
-        );
-      default:
-        return null;
-    }
-  };
+  switch (status) {
+    case "pending":
+      return (
+        <span className="inline-flex items-center gap-1 px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs font-medium">
+          <Clock className="w-3 h-3" /> Pending
+        </span>
+      );
+    case "dispatching":
+      return (
+        <span className="inline-flex items-center gap-1 px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-medium">
+          <TrendingUp className="w-3 h-3" /> Dispatching
+        </span>
+      );
+    case "assigned":
+      return (
+        <span className="inline-flex items-center gap-1 px-2 py-1 bg-indigo-100 text-indigo-800 rounded-full text-xs font-medium">
+          <Bike className="w-3 h-3" /> Assigned
+        </span>
+      );
+    case "completed":
+      return (
+        <span className="inline-flex items-center gap-1 px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium">
+          <CheckCircle className="w-3 h-3" /> Completed
+        </span>
+      );
+    case "manual":
+      return (
+        <span className="inline-flex items-center gap-1 px-2 py-1 bg-red-100 text-red-800 rounded-full text-xs font-medium">
+          <XCircle className="w-3 h-3" /> Needs Assignment
+        </span>
+      );
+    case "cancelled":
+      return (
+        <span className="inline-flex items-center gap-1 px-2 py-1 bg-gray-100 text-gray-800 rounded-full text-xs font-medium">
+          <XCircle className="w-3 h-3" /> Cancelled
+        </span>
+      );
+    default:
+      return null;
+  }
+};
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -127,8 +150,7 @@ export default function AdminDashboard() {
               <TrendingUp className="w-5 h-5 text-green-600" />
             </div>
             <p className="text-gray-600 text-sm mb-1">Total Deliveries</p>
-            <p className="text-3xl font-bold text-gray-900">{stats.totalDeliveries}</p>
-            <p className="text-sm text-green-600 mt-2">+12% this week</p>
+            <p className="text-3xl font-bold text-gray-900">{dashboardData.totalDeliveries}</p>
           </div>
 
           <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-200">
@@ -139,7 +161,7 @@ export default function AdminDashboard() {
             </div>
             <p className="text-gray-600 text-sm mb-1">Active Riders</p>
             <p className="text-3xl font-bold text-gray-900">
-              {stats.activeRiders}/{stats.totalRiders}
+              {dashboardData.activeRiders}/{dashboardData.totalRiders}
             </p>
             <p className="text-sm text-gray-600 mt-2">On duty now</p>
           </div>
@@ -151,7 +173,7 @@ export default function AdminDashboard() {
               </div>
             </div>
             <p className="text-gray-600 text-sm mb-1">Total Traders</p>
-            <p className="text-3xl font-bold text-gray-900">{stats.totalTraders}</p>
+            <p className="text-3xl font-bold text-gray-900">{dashboardData.totalTraders}</p>
             <p className="text-sm text-gray-600 mt-2">Registered users</p>
           </div>
 
@@ -162,7 +184,7 @@ export default function AdminDashboard() {
               </div>
             </div>
             <p className="text-gray-600 text-sm mb-1">Completed Today</p>
-            <p className="text-3xl font-bold text-gray-900">{stats.completedToday}</p>
+            <p className="text-3xl font-bold text-gray-900">{dashboardData.completedToday}</p>
             <p className="text-sm text-gray-600 mt-2">Deliveries</p>
           </div>
         </div>
@@ -234,7 +256,7 @@ export default function AdminDashboard() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
-                  {recentDeliveries.map((delivery) => (
+                  {(dashboardData.recentActivities ?? []).map((delivery) => (
                     <tr key={delivery.id} className="hover:bg-gray-50">
                       <td className="px-6 py-4 font-mono text-sm font-medium text-gray-900">
                         {delivery.id}
@@ -248,7 +270,7 @@ export default function AdminDashboard() {
                       </td>
                       <td className="px-6 py-4">{getStatusBadge(delivery.status)}</td>
                       <td className="px-6 py-4 text-sm text-gray-600">
-                        {delivery.time}
+                        {timeAgo(delivery.time)}
                       </td>
                     </tr>
                   ))}
@@ -264,7 +286,7 @@ export default function AdminDashboard() {
                   <h3 className="font-semibold text-gray-900">Pending Assignments</h3>
                 </div>
                 <p className="text-3xl font-bold text-gray-900">
-                  {stats.pendingAssignments}
+                  {dashboardData.pendingAssignments}
                 </p>
                 <button
                   onClick={() => navigate("/admin/rider-assignment")}
@@ -280,7 +302,7 @@ export default function AdminDashboard() {
                   <h3 className="font-semibold text-gray-900">Active Deliveries</h3>
                 </div>
                 <p className="text-3xl font-bold text-gray-900">
-                  {stats.activeDeliveries}
+                  {dashboardData.activeDeliveries}
                 </p>
                 <p className="mt-3 text-sm text-gray-600">In progress</p>
               </div>
@@ -292,7 +314,7 @@ export default function AdminDashboard() {
             <h2 className="text-2xl font-bold text-gray-900 mb-4">Top Riders</h2>
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
               <div className="space-y-4">
-                {topRiders.map((rider, index) => (
+                {(dashboardData.topRiders??[] ).map((rider, index) => (
                   <div
                     key={rider.name}
                     className="flex items-center gap-4 p-4 bg-gray-50 rounded-lg"
@@ -306,27 +328,13 @@ export default function AdminDashboard() {
                         {rider.deliveries} deliveries
                       </p>
                     </div>
-                    <div className="text-right">
-                      <div className="flex items-center gap-1">
-                        <span className="text-yellow-500">★</span>
-                        <span className="font-semibold text-gray-900">
-                          {rider.rating}
-                        </span>
-                      </div>
-                    </div>
+                 
                   </div>
                 ))}
               </div>
             </div>
 
-            {/* Revenue Card */}
-            <div className="mt-6 bg-gradient-to-br from-indigo-600 to-purple-700 rounded-xl shadow-sm p-6 text-white">
-              <h3 className="font-semibold mb-2">Total Revenue (March)</h3>
-              <p className="text-3xl font-bold mb-1">
-                KSh {stats.revenue.toLocaleString()}
-              </p>
-              <p className="text-sm text-indigo-200">+18% from last month</p>
-            </div>
+          
           </div>
         </div>
       </div>

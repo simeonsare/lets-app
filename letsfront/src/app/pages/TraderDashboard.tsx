@@ -15,6 +15,7 @@ import {
 
 
 // Mock delivery data
+
 const mockDeliveries = [
   {
     id: "DEL001",
@@ -58,6 +59,7 @@ const token = localStorage.getItem("authToken");
 export default function TraderDashboard() {
   
   const navigate = useNavigate();
+  const name = localStorage.getItem("name") || "Trader";
   const [deliveries, setDeliveries] = useState([]);
   useEffect(() => {
     fetch("/api/deliveries/", {
@@ -75,7 +77,7 @@ export default function TraderDashboard() {
         }
         return res.json();
       })
-      .then((data) => setDeliveries(data))
+      .then((data) => setDeliveries(data.deliveries))
       .then(() => console.log(deliveries))
       .catch((err) => {
         toast.error("Failed to fetch deliveries");
@@ -85,9 +87,9 @@ export default function TraderDashboard() {
 
   
 
-  const pendingCount = mockDeliveries.filter((d) => d.status === "pending").length;
-  const assignedCount = mockDeliveries.filter((d) => d.status === "assigned").length;
-  const deliveredCount = mockDeliveries.filter((d) => d.status === "delivered").length;
+  const pendingCount = deliveries.filter((d) => d.status === "pending").length;
+  const assignedCount = deliveries.filter((d) => d.status === "assigned").length;
+  const deliveredCount = deliveries.filter((d) => d.status === "delivered").length;
 
 //getting our logistic service providers 
   const [lsps, setLsps] = useState([]);
@@ -173,7 +175,7 @@ export default function TraderDashboard() {
             </div>
             <div>
               <h1 className="text-xl font-bold text-gray-900">Trader Dashboard</h1>
-              <p className="text-sm text-gray-600">Kamukunji Market</p>
+              <p className="text-sm text-gray-600">{name}</p>
             </div>
           </div>
           <div className="flex items-center gap-4">
@@ -317,7 +319,7 @@ export default function TraderDashboard() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
-                {mockDeliveries.map((delivery) => (
+                {deliveries.map((delivery) => (
                   <tr key={delivery.id} className="hover:bg-gray-50 transition">
                     <td className="px-6 py-4">
                       <span className="font-mono text-sm font-medium text-gray-900">
@@ -327,11 +329,11 @@ export default function TraderDashboard() {
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-2">
                         <MapPin className="w-4 h-4 text-gray-400" />
-                        <span className="text-gray-900">{delivery.destination}</span>
+                        <span className="text-gray-900">{delivery.dropoff_location}</span>
                       </div>
                     </td>
-                    <td className="px-6 py-4 text-gray-900">{delivery.packageDesc}</td>
-                    <td className="px-6 py-4 text-gray-900">{delivery.quantity} items</td>
+                    <td className="px-6 py-4 text-gray-900">{delivery.package_details}</td>
+                    <td className="px-6 py-4 text-gray-900">{delivery.quantity} Kg</td>
                     <td className="px-6 py-4">
                       {delivery.rider ? (
                         <div className="flex items-center gap-2">

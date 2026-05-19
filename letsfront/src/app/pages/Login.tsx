@@ -32,6 +32,9 @@ export default function Login() {
       const data = await res.json();
       localStorage.setItem("authToken", data.token);
       localStorage.setItem("role", data.role);
+      localStorage.setItem("name", data.name);
+
+      
 
        // implement role based redirection  
       if (data.role=== "trader") {
@@ -39,6 +42,7 @@ export default function Login() {
         window.location.reload();
       }
       else if (data.role === "rider") {
+        localStorage.setItem("name", data.name);
         navigate("/rider/dashboard");
         window.location.reload();
       }

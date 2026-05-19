@@ -88,6 +88,30 @@ const handleSubmit = async (e: React.FormEvent) => {
               setShowSpinner(false);
               toast.success("Payment successful! Your delivery request has been submitted.");
               setShowModal(false);
+              // Proceed to create delivery request after successful payment
+              try {
+
+                const res = await fetch("/api/request-delivery/", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  "Authorization": `Token ${token}`,
+                },
+                body: JSON.stringify(formData),
+              });
+
+                if (!res.ok) {
+                  throw new Error("Request failed");
+                }
+                const data = await res.json();
+                toast.success("Request successful.");
+                setTimeout(() => {
+                  window.location.href = "/trader/dashboard";
+                }, 1000); // 1-second delay 
+                
+              } catch (error) {
+                
+              }
             } else if (statusData.status === "failed") {
               clearInterval(interval);
               setShowSpinner(false);
@@ -98,32 +122,7 @@ const handleSubmit = async (e: React.FormEvent) => {
           setShowSpinner(false);
           toast.error("Error initiating payment");
         }
-          // Proceed to create delivery request after successful payment
-          try {
-        const res = await fetch("/api/request-delivery/", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Token ${token}`,
-        },
-        body: JSON.stringify(formData),
-      });
-
-      if (!res.ok) {
-        throw new Error("Request failed");
-      }
-      const data = await res.json();
-      toast.success("Request successful.");
-      // setTimeout(() => {
-      //   window.location.href = "/trader/dashboard";
-      // }, 2000); // 2-second delay
-      
-    } catch (error) {
-      
-    }
-    // Mock submission - would save to backend
-    toast.success("Payment successful! Your delivery request has been submitted.");
-    //navigate("/trader/dashboard");
+  
   };
         }
         return; 
@@ -379,6 +378,11 @@ const handleSubmit = async (e: React.FormEvent) => {
 
         </div>
       </div>
+
+      
+
+
+
     </div>
   );
 }
